@@ -1,6 +1,8 @@
 #ifndef _CONFIG_H_
 #define _CONFIG_H_
 
+#include <stdbool.h>
+
 #include "types.h" // TIndex / TPort
 
 const TIndex WIFI_MAX_DECONNECTED_CLIENT = 15;
@@ -9,7 +11,8 @@ const bool LOST_PACKET_BY_DEFAULT=false;
 
 #define _USE_VSOCK_BY_DEFAULT_
 
-const TPort WIFI_CLIENT_PORT_VHOST = 8211;
+// const TPort WIFI_CLIENT_PORT_VHOST = 8211;
+#define WIFI_CLIENT_PORT_VHOST 8211
 const TPort WIFI_CLIENT_PORT_INET = WIFI_CLIENT_PORT_VHOST+1;
 
 const TPort WIFI_SPY_PORT = WIFI_CLIENT_PORT_VHOST+2;

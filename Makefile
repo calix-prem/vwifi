@@ -12,7 +12,7 @@ SRC		=	src
 OBJ		=	obj
 MAN		=	man
 
-CC		=	g++
+# CC		=	g++
 
 #MODE= -O3 -s -Wall -Wextra -pedantic -DNDEBUG # //////////      RELEASE WITHOUT ASSERT
 MODE= -O3 -s -Wall -Wextra -pedantic # //////////      RELEASE
@@ -76,23 +76,22 @@ $(OBJ)/ckernelwifi.o: ckernelwifi.cc ckernelwifi.h $(OBJ)/csocket.o $(OBJ)/csele
 
 
 vwifi-server : vwifi-server.cc config.h $(OBJ)/csocket.o $(OBJ)/csocketserver.o $(OBJ)/cinfosocket.o $(OBJ)/cwifi.o $(OBJ)/cwifiserver.o $(OBJ)/cselect.o $(OBJ)/cinfowifi.o $(OBJ)/ccoordinate.o $(OBJ)/cctrlserver.o $(OBJ)/tools.o $(OBJ)/cdynbuffer.o
-	$(CC) $(CFLAGS) $(DEFS) $(LDFLAGS) -o $@ $^ $(LIBS)
+	$(CXX) $(CFLAGS) $(DEFS) $(LDFLAGS) -o $@ $^ $(LIBS)
 
 vwifi-ctrl : vwifi-ctrl.cc config.h $(OBJ)/csocket.o $(OBJ)/csocketclient.o $(OBJ)/ccoordinate.o $(OBJ)/cinfowifi.o $(OBJ)/tools.o $(OBJ)/cdynbuffer.o
-	$(CC) $(CFLAGS) $(DEFS) $(LDFLAGS) -o $@ $^ $(LIBS)
+	$(CXX) $(CFLAGS) $(DEFS) $(LDFLAGS) -o $@ $^ $(LIBS)
 
 vwifi-client : vwifi-client.cc $(OBJ)/cwirelessdevice.o $(OBJ)/cwirelessdevicelist.o $(OBJ)/cwifi.o $(OBJ)/cwificlient.o $(OBJ)/ckernelwifi.o $(OBJ)/cthread.o $(OBJ)/cselect.o $(OBJ)/csocket.o $(OBJ)/csocketclient.o $(OBJ)/cmonwirelessdevice.o $(OBJ)/tools.o $(OBJ)/cdynbuffer.o
-	$(CC) $(CFLAGS) $(DEFS) $(LDFLAGS) -o $@ $(NETLINK_FLAGS) $^ $(LIBS) $(NETLINK_LIBS) $(THREAD_LIBS)
+	$(CXX) $(CFLAGS) $(DEFS) $(LDFLAGS) -o $@ $(NETLINK_FLAGS) $^ $(LIBS) $(NETLINK_LIBS) $(THREAD_LIBS)
 
 vwifi-spy : vwifi-spy.cc $(OBJ)/cwirelessdevice.o $(OBJ)/cwirelessdevicelist.o $(OBJ)/cwifi.o $(OBJ)/cwificlient.o $(OBJ)/ckernelwifi.o $(OBJ)/cthread.o $(OBJ)/cselect.o $(OBJ)/csocket.o $(OBJ)/csocketclient.o $(OBJ)/cmonwirelessdevice.o $(OBJ)/tools.o $(OBJ)/cdynbuffer.o
-	$(CC) $(CFLAGS) $(DEFS) $(LDFLAGS) -o $@ $(NETLINK_FLAGS) $^ $(LIBS) $(NETLINK_LIBS) $(THREAD_LIBS)
+	$(CXX) $(CFLAGS) $(DEFS) $(LDFLAGS) -o $@ $(NETLINK_FLAGS) $^ $(LIBS) $(NETLINK_LIBS) $(THREAD_LIBS)
 
 vwifi-inet-monitor : vwifi-inet-monitor.cc  $(OBJ)/cwirelessdevice.o $(OBJ)/cmonwirelessdevice.o
-	$(CC) $(CFLAGS) $(DEFS) $(LDFLAGS) -o $@ $(NETLINK_FLAGS) $^ $(LIBS) $(NETLINK_LIBS) $(THREAD_LIBS)
-
+	$(CXX) $(CFLAGS) $(DEFS) $(LDFLAGS) -o $@ $(NETLINK_FLAGS) $^ $(LIBS) $(NETLINK_LIBS) $(THREAD_LIBS)
 
 $(OBJ)/%.o: %.cc
-	$(CC) $(CFLAGS) $(DEFS) $(LDFLAGS) -o $@ $(NETLINK_FLAGS) -c $<
+	$(CXX) $(CFLAGS) $(DEFS) $(LDFLAGS) -o $@ $(NETLINK_FLAGS) -c $<
 
 $(MAN)/$(NAME).1.gz : $(MAN)/$(NAME).1
 	gzip -c $(MAN)/$(NAME).1 > $(MAN)/$(NAME).1.gz
@@ -121,10 +120,10 @@ gitversion: .git
 	@sed -i "s/^\(VERSION.[^\-]*\)\(-.*\)\?/\1-$(shell git log --format="%H" -n 1)/g" Makefile
 
 install : build
-ifneq ($(EUID),0)
-	@echo "Please run 'make install' as root user"
-	@exit 1
-endif
+# ifneq ($(EUID),0)
+# 	@echo "Please run 'make install' as root user"
+# 	@exit 1
+# endif
 	chmod +x $(EXEC)
 	# Install binaire :
 	mkdir -p $(BINDIR) && cp -p $(EXEC) $(BINDIR)
