@@ -34,11 +34,11 @@ void Help(char* nameOfProg)
 	cout<<"	Display the version of "<<nameOfProg<<endl;
 }
 
-int AskList()
+int AskList(TPort port_number)
 {
 	CSocketClientINET socket;
 
-	socket.Init(ADDRESS_IP,CTRL_PORT);
+	socket.Init(ADDRESS_IP,port_number);
 
 	if( ! socket.ConnectLoop() )
 	{
@@ -81,16 +81,16 @@ int AskList()
 	return 0;
 }
 
-int ChangeCoordinate(int argc, char *argv[])
+int ChangeCoordinate(char *prog_name, TPort port_number, int argc, char *argv[])
 {
-	if( argc != 6 )
+	if( argc != 4 )
 	{
 			cerr<<"Error : set : the number of parameter is uncorrect"<<endl;
-			Help(argv[0]);
+			Help(prog_name);
 			return 1;
 	}
 
-	TCID cid=atoi(argv[2]);
+	TCID cid=atoi(argv[0]);
 
 	if( cid < TCID_GUEST_MIN )
 	{
@@ -98,16 +98,16 @@ int ChangeCoordinate(int argc, char *argv[])
 			return 1;
 	}
 
-	TValue x=atoi(argv[3]);
-	TValue y=atoi(argv[4]);
-	TValue z=atoi(argv[5]);
+	TValue x=atoi(argv[1]);
+	TValue y=atoi(argv[2]);
+	TValue z=atoi(argv[3]);
 	CCoordinate coo(x,y,z);
 
 	cout<<cid<<" "<<coo<<" "<<endl;
 
 	CSocketClientINET socket;
 
-	socket.Init(ADDRESS_IP,CTRL_PORT);
+	socket.Init(ADDRESS_IP,port_number);
 
 	if( ! socket.ConnectLoop() )
 	{
@@ -142,19 +142,19 @@ int ChangeCoordinate(int argc, char *argv[])
 	return 0;
 }
 
-int ChangePacketLoss(int argc, char *argv[])
+int ChangePacketLoss(char *prog_name, TPort port_number, int argc, char *argv[])
 {
-	if( argc != 3 )
+	if( argc != 1 )
 	{
 			cerr<<"Error : loss : the number of parameter is uncorrect"<<endl;
-			Help(argv[0]);
+			Help(prog_name);
 			return 1;
 	}
 
 	int value;
-	if ( ! strcmp(argv[2],"yes") )
+	if ( ! strcmp(argv[0],"yes") )
 		value=1;
-	else if ( ! strcmp(argv[2],"no") )
+	else if ( ! strcmp(argv[0],"no") )
 		value=0;
 	else
 	{
@@ -164,7 +164,7 @@ int ChangePacketLoss(int argc, char *argv[])
 
 	CSocketClientINET socket;
 
-	socket.Init(ADDRESS_IP,CTRL_PORT);
+	socket.Init(ADDRESS_IP,port_number);
 
 	if( ! socket.ConnectLoop() )
 	{
@@ -197,14 +197,14 @@ int ChangePacketLoss(int argc, char *argv[])
 	return 0;
 }
 
-int AskStatus()
+int AskStatus(TPort port_number)
 {
 	CSocketClientINET socket;
 
 	cout<<"CTRL : IP : "<<ADDRESS_IP<<endl;
 	cout<<"CTRL : Port : "<<CTRL_PORT<<endl;
 
-	socket.Init(ADDRESS_IP,CTRL_PORT);
+	socket.Init(ADDRESS_IP,port_number);
 
 	if( ! socket.ConnectLoop() )
 	{
@@ -293,11 +293,11 @@ int AskStatus()
 	return 0;
 }
 
-int AskShow()
+int AskShow(TPort port_number)
 {
 	CSocketClientINET socket;
 
-	socket.Init(ADDRESS_IP,CTRL_PORT);
+	socket.Init(ADDRESS_IP,port_number);
 
 	if( ! socket.ConnectLoop() )
 	{
@@ -345,19 +345,19 @@ int AskShow()
 
 	cout<<"----------------"<<endl;
 
-	return AskList();
+	return AskList(port_number);
 }
 
-int DistanceBetweenCID(int argc, char *argv[])
+int DistanceBetweenCID(char *prog_name, TPort port_number, int argc, char *argv[])
 {
-	if( argc != 4 )
+	if( argc != 2 )
 	{
 			cerr<<"Error : distance : the number of parameter is uncorrect"<<endl;
-			Help(argv[0]);
+			Help(prog_name);
 			return 1;
 	}
 
-	TCID cid1=atoi(argv[2]);
+	TCID cid1=atoi(argv[0]);
 
 	if( cid1 < TCID_GUEST_MIN )
 	{
@@ -365,7 +365,7 @@ int DistanceBetweenCID(int argc, char *argv[])
 			return 1;
 	}
 
-	TCID cid2=atoi(argv[3]);
+	TCID cid2=atoi(argv[1]);
 
 	if( cid2 < TCID_GUEST_MIN )
 	{
@@ -375,7 +375,7 @@ int DistanceBetweenCID(int argc, char *argv[])
 
 	CSocketClientINET socket;
 
-	socket.Init(ADDRESS_IP,CTRL_PORT);
+	socket.Init(ADDRESS_IP,port_number);
 
 	if( ! socket.ConnectLoop() )
 	{
@@ -439,11 +439,11 @@ int DistanceBetweenCID(int argc, char *argv[])
 	return 0;
 }
 
-int CloseAllClient()
+int CloseAllClient(TPort port_number)
 {
 	CSocketClientINET socket;
 
-	socket.Init(ADDRESS_IP,CTRL_PORT);
+	socket.Init(ADDRESS_IP,port_number);
 
 	if( ! socket.ConnectLoop() )
 	{
@@ -466,40 +466,60 @@ int CloseAllClient()
 	return 0;
 }
 
+static const char usage[] = "Usage: vwifi-ctrl [-h] [-v|--version] [-p PORT]";
+
 int main(int argc , char *argv[])
 {
-	if( argc == 1 )
+	int arg_idx = 1;
+	TPort port_number = 0;
+
+	while (arg_idx < argc)
 	{
-		Help(argv[0]);
-		return 0;
+		if( ! strcmp("-v", argv[arg_idx]) || ! strcmp("--version", argv[arg_idx]) )
+		{
+			std::cout<<"Version : "<<VERSION<<std::endl;
+			return 0;
+		}
+		else if( ! strcmp("-p", argv[arg_idx]) && (arg_idx + 1) < argc)
+		{
+			port_number = std::stoi(argv[arg_idx+1]);
+			arg_idx++;
+		}
+		else if( ! strcmp("-h", argv[arg_idx]) )
+		{
+			Help(argv[0]);
+			return 1;
+		}
+		else
+		{
+			std::cerr<<"Error : too many parameters"<<std::endl;
+			Help(argv[0]);
+			return 1;
+		}
+
+		arg_idx++;
 	}
 
-	if( ! strcmp(argv[1],"-v") || ! strcmp(argv[1],"--version") )
-	{
-		cout<<"Version : "<<VERSION<<endl;
-		return 0;
-	}
+	if( ! strcmp(argv[arg_idx],"ls") )
+		return AskList(port_number);
 
-	if( ! strcmp(argv[1],"ls") )
-		return AskList();
+	if( ! strcmp(argv[arg_idx],"set") )
+		return ChangeCoordinate(argv[0], port_number, argc, argv);
 
-	if( ! strcmp(argv[1],"set") )
-		return ChangeCoordinate(argc, argv);
+	if( ! strcmp(argv[arg_idx],"loss") )
+		return ChangePacketLoss(argv[0], port_number, argc, argv);
 
-	if( ! strcmp(argv[1],"loss") )
-		return ChangePacketLoss(argc, argv);
+	if( ! strcmp(argv[arg_idx],"show") )
+		return AskShow(port_number);
 
-	if( ! strcmp(argv[1],"show") )
-		return AskShow();
+	if( ! strcmp(argv[arg_idx],"status") )
+		return AskStatus(port_number);
 
-	if( ! strcmp(argv[1],"status") )
-		return AskStatus();
+	if( ! strcmp(argv[arg_idx],"distance") )
+		return DistanceBetweenCID(argv[0], port_number, argc, argv);
 
-	if( ! strcmp(argv[1],"distance") )
-		return DistanceBetweenCID(argc, argv);
-
-	if( ! strcmp(argv[1],"close") )
-		return CloseAllClient();
+	if( ! strcmp(argv[arg_idx],"close") )
+		return CloseAllClient(port_number);
 
 	cerr<<argv[0]<<" : Error : unknown order : "<<argv[1]<<endl;
 

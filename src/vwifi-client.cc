@@ -47,6 +47,7 @@ void  signal_handler(int signal_num)
 	std::cout << "OUT SWITCH" << std::endl ;
 }
 
+static const char usage[] = "Usage: vwifi-client [-h] [-v|--version] [-i IP_ADDR] [-p PORT]";
 
 int main (int argc , char ** argv){
 
@@ -58,27 +59,64 @@ int main (int argc , char ** argv){
 	signal(SIGTSTP, signal_handler);
 	//signal(SIGCONT, signal_handler);
 
-	if( argc > 2 )
-	{
-		std::cerr<<"Error : too many parameters"<<std::endl;
-		return 1;
-	}
+	int arg_idx = 1;
+	std::string ip_addr;
+	TPort port_number = 0;
 
-	if( argc == 2 )
+	while (arg_idx < argc)
 	{
-		if( ! strcmp("-v", argv[1]) || ! strcmp("--version", argv[1]) )
+		if( ! strcmp("-v", argv[arg_idx]) || ! strcmp("--version", argv[arg_idx]) )
 		{
 			std::cout<<"Version : "<<VERSION<<std::endl;
 			return 0;
 		}
+		else if( ! strcmp("-i", argv[arg_idx]) && (arg_idx + 1) < argc)
+		{
+			ip_addr = std::string(argv[arg_idx+1]);
+			arg_idx++;
+		}
+		else if( ! strcmp("-p", argv[arg_idx]) && (arg_idx + 1) < argc)
+		{
+			port_number = std::stoi(argv[arg_idx+1]);
+			arg_idx++;
+		}
+		else if( ! strcmp("-h", argv[arg_idx]) )
+		{
+			std::cerr<<usage<<std::endl;
+			return 1;
+		}
+		else
+		{
+			std::cerr<<"Error : too many parameters"<<std::endl;
+			std::cerr<<usage<<std::endl;
+			return 1;
+		}
+
+		arg_idx++;
+	}
+
+	if( port_number == 0 )
+	{
+		if ( ip_addr.empty() )
+		{
+			port_number = WIFI_CLIENT_PORT_VHOST;
+		}
+		else
+		{
+			port_number = WIFI_CLIENT_PORT_INET;
+		}
+	}
+
+	if( ! ip_addr.empty() )
+	{
 
 		wifiClient=new CWifiClient<CSocketClientINET>;
-		((CWifiClient<CSocketClientINET>*)wifiClient)->Init(argv[1], WIFI_CLIENT_PORT_INET);
+		((CWifiClient<CSocketClientINET>*)wifiClient)->Init(ip_addr.c_str(), port_number);
 	}
 	else
 	{
 		wifiClient=new CWifiClient<CSocketClientVHOST>;
-		((CWifiClient<CSocketClientVHOST>*)wifiClient)->Init(WIFI_CLIENT_PORT_VHOST);
+		((CWifiClient<CSocketClientVHOST>*)wifiClient)->Init(port_number);
 	}
 
 	if(!wifiClient->start())

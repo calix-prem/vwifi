@@ -136,15 +136,34 @@ void ForwardData(CWifiServer* serverMaster, bool masterSendToOwnClients, CWifiSe
 	}
 }
 
-int vwifi_server()
+int vwifi_server(TPort port_number, TPort spy_port_number, TPort ctrl_port_number)
 {
 	TDescriptor socket;
 
 	CSelect scheduler;
 
+	TPort vsock_port = WIFI_CLIENT_PORT_VHOST;
+	TPort tcp_port = WIFI_CLIENT_PORT_INET;
+
+	if (0 != port_number)
+	{
+		vsock_port = port_number;
+		tcp_port = port_number;
+	}
+
+	if (0 == spy_port_number)
+	{
+		spy_port_number = WIFI_SPY_PORT;
+	}
+
+	if (0 == ctrl_port_number)
+	{
+		ctrl_port_number = CTRL_PORT;
+	}
+
 	CWifiServer wifiGuestVHostServer(AF_VSOCK);
 	cout<<"CLIENT VHOST : ";
-	wifiGuestVHostServer.Init(WIFI_CLIENT_PORT_VHOST);
+	wifiGuestVHostServer.Init(vsock_port);
 	if( ! wifiGuestVHostServer.Listen(WIFI_MAX_DECONNECTED_CLIENT) )
 	{
 		cerr<<"Error : wifiGuestVHostServer.Listen"<<endl;
@@ -153,7 +172,7 @@ int vwifi_server()
 
 	CWifiServer wifiGuestINETServer(AF_INET);
 	cout<<"CLIENT TCP : ";
-	wifiGuestINETServer.Init(WIFI_CLIENT_PORT_INET);
+	wifiGuestINETServer.Init(tcp_port);
 	if( ! wifiGuestINETServer.Listen(WIFI_MAX_DECONNECTED_CLIENT) )
 	{
 		cerr<<"Error : wifiGuestINETServer.Listen"<<endl;
@@ -163,7 +182,7 @@ int vwifi_server()
 	cout<<"SPY : ";
 	CWifiServer wifiSpyServer(AF_INET);
 	wifiSpyServer.SetPacketLoss(false);
-	wifiSpyServer.Init(WIFI_SPY_PORT);
+	wifiSpyServer.Init(spy_port_number);
 	if( ! wifiSpyServer.Listen(1) )
 	{
 		cerr<<"Error : wifiSpyServer.Listen"<<endl;
@@ -172,7 +191,7 @@ int vwifi_server()
 
 	cout<<"CTRL : ";
 	CCTRLServer ctrlServer(&wifiGuestVHostServer, &wifiGuestINETServer, &wifiSpyServer,&scheduler);
-	ctrlServer.Init(CTRL_PORT);
+	ctrlServer.Init(ctrl_port_number);
 	if( ! ctrlServer.Listen() )
 	{
 		cerr<<"Error : ctrlServer.Listen"<<endl;
@@ -271,20 +290,52 @@ int vwifi_server()
 	return 0;
 }
 
+static const char usage[] = "Usage: vwifi-server [-h] [-p PORT] [-s SPY_PORT] [-c CTRL_PORT]";
+
 int main(int argc, char** argv)
 {
-	if( argc > 1 )
+	int arg_idx = 1;
+	TPort port_number = 0;
+	TPort spy_port_number = 0;
+	TPort ctrl_port_number = 0;
+
+	while (arg_idx < argc)
 	{
 		if( ! strcmp("-v", argv[1]) || ! strcmp("--version", argv[1]) )
 		{
 			cout<<"Version : "<<VERSION<<endl;
 			return 0;
 		}
+		else if( ! strcmp("-p", argv[arg_idx]) && (arg_idx + 1) < argc)
+		{
+			port_number = std::stoi(argv[arg_idx+1]);
+			arg_idx++;
+		}
+		else if( ! strcmp("-s", argv[arg_idx]) && (arg_idx + 1) < argc)
+		{
+			spy_port_number = std::stoi(argv[arg_idx+1]);
+			arg_idx++;
+		}
+		else if( ! strcmp("-c", argv[arg_idx]) && (arg_idx + 1) < argc)
+		{
+			ctrl_port_number = std::stoi(argv[arg_idx+1]);
+			arg_idx++;
+		}
+		else if( ! strcmp("-h", argv[arg_idx]) )
+		{
+			std::cerr<<usage<<std::endl;
+			return 1;
+		}
+		else
+		{
+			std::cerr<<"Error : unknown parameter"<<std::endl;
+			std::cerr<<usage<<std::endl;
+			return 1;
+		}
 
-		cerr<<"Error : unknown parameter"<<endl;
-		return 1;
+		arg_idx++;
 	}
 
-	return vwifi_server();
+	return vwifi_server(port_number, spy_port_number, ctrl_port_number);
 }
 
