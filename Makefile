@@ -1,7 +1,7 @@
 #/usr/bin/make -f
 #
 NAME	=	vwifi
-VERSION	=	2
+VERSION	=	3
 BINDIR	=	$(DESTDIR)/usr/local/bin
 MANDIR	=	$(DESTDIR)/usr/local/man/man1
 
@@ -15,8 +15,8 @@ MAN		=	man
 # CC		=	g++
 
 #MODE= -O3 -s -Wall -Wextra -pedantic -DNDEBUG # //////////      RELEASE WITHOUT ASSERT
-MODE= -O3 -s -Wall -Wextra -pedantic # //////////      RELEASE
-#MODE= -g -Wall -Wextra -pedantic -D_DEBUG # //////////      DEBUG
+# MODE= -O3 -s -Wall -Wextra -pedantic # //////////      RELEASE
+MODE= -g -Wall -Wextra -pedantic -D_DEBUG # //////////      DEBUG
 #MODE= -pg # //////////      PROFILER --> view with : gprof $(NAME)
 
 CFLAGS  +=  $(MODE)

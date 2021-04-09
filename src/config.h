@@ -23,7 +23,7 @@ const TPort CTRL_PORT = WIFI_CLIENT_PORT_VHOST+3;
 
 #ifdef _DEBUG
 	// #define _VERBOSE1
-	// #define _VERBOSE2
+	#define _VERBOSE2
 #endif
 
 #endif
