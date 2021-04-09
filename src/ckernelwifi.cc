@@ -188,6 +188,12 @@ int CKernelWifi::process_messages(struct nl_msg *msg)
 	//cout_mac_address(&framedst);
 #endif
 
+#ifdef _DEBUG
+	struct ether_addr trailing;
+	memcpy(&trailing, data + 16, ETH_ALEN);
+	std::cout << "[from_nl] trailing: ";  cout_mac_address(&trailing);std::cout<<std::endl ;
+#endif
+
 	/* compare tx src to frame src, update TX src ATTR in msg if needed */
 	/* if we rebuild the nl msg, this can change */
 	if (memcmp(&framesrc, src, ETH_ALEN) != 0) {
