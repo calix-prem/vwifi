@@ -139,6 +139,10 @@ int CKernelWifi::process_messages(struct nl_msg *msg)
 	/* we get hwsim mac (id)*/
 	struct ether_addr *src = (struct ether_addr *)nla_data(attrs[HWSIM_ATTR_ADDR_TRANSMITTER]);
 
+#ifdef _DEBUG
+	std::cout << "[from_nl] src hwsim: "; cout_mac_address(src);std::cout<<std::endl ;
+#endif
+
 	/* Let's flag this frame as ACK'ed */
 	/* whatever that means... */
 	unsigned int flags = nla_get_u32(attrs[HWSIM_ATTR_FLAGS]);
