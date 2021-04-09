@@ -191,7 +191,17 @@ int CKernelWifi::process_messages(struct nl_msg *msg)
 #ifdef _DEBUG
 	struct ether_addr trailing;
 	memcpy(&trailing, data + 16, ETH_ALEN);
-	std::cout << "[from_nl] trailing: ";  cout_mac_address(&trailing);std::cout<<std::endl ;
+	std::cout << "[from_nl] trailing[0]: ";  cout_mac_address(&trailing);std::cout<<std::endl ;
+	memcpy(&trailing, data + 22, ETH_ALEN);
+	std::cout << "[from_nl] trailing[1]: ";  cout_mac_address(&trailing);std::cout<<std::endl ;
+	memcpy(&trailing, data + 28, ETH_ALEN);
+	std::cout << "[from_nl] trailing[2]: ";  cout_mac_address(&trailing);std::cout<<std::endl ;
+	memcpy(&trailing, data + 34, ETH_ALEN);
+	std::cout << "[from_nl] trailing[3]: ";  cout_mac_address(&trailing);std::cout<<std::endl ;
+	memcpy(&trailing, data + 40, ETH_ALEN);
+	std::cout << "[from_nl] trailing[4]: ";  cout_mac_address(&trailing);std::cout<<std::endl ;
+	memcpy(&trailing, data + 46, ETH_ALEN);
+	std::cout << "[from_nl] trailing[5]: ";  cout_mac_address(&trailing);std::cout<<std::endl ;
 #endif
 
 	/* compare tx src to frame src, update TX src ATTR in msg if needed */
