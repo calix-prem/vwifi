@@ -492,9 +492,7 @@ int main(int argc , char *argv[])
 		}
 		else
 		{
-			std::cerr<<"Error : too many parameters"<<std::endl;
-			Help(argv[0]);
-			return 1;
+			break;
 		}
 
 		arg_idx++;
