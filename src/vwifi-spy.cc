@@ -103,7 +103,7 @@ int main (int argc , char ** argv){
 	if( ! ip_addr.empty() )
 	{
 		wifiClient=new CWifiClient<CSocketClientINET>;
-		((CWifiClient<CSocketClientINET>*)wifiClient)->Init(argv[1], port_number);
+		((CWifiClient<CSocketClientINET>*)wifiClient)->Init(ip_addr.c_str(), port_number);
 	}
 	else
 	{
