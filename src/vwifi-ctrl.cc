@@ -12,7 +12,7 @@ using namespace std;
 
 void Help(char* nameOfProg)
 {
-	cout<<nameOfProg<<" [order]"<<endl;
+	cout<<nameOfProg<<" -p [ctrl port] [order]"<<endl;
 	cout<<" with [order] :"<<endl;
 	cout<<"	ls"<<endl;
 	cout<<"		- List the Clients"<<endl;
@@ -86,6 +86,7 @@ int ChangeCoordinate(char *prog_name, TPort port_number, int argc, char *argv[])
 	if( argc != 4 )
 	{
 			cerr<<"Error : set : the number of parameter is uncorrect"<<endl;
+			cerr<<argc<<endl;
 			Help(prog_name);
 			return 1;
 	}
@@ -498,28 +499,32 @@ int main(int argc , char *argv[])
 		arg_idx++;
 	}
 
-	if( ! strcmp(argv[arg_idx],"ls") )
-		return AskList(port_number);
+	if (argc > arg_idx)
+	{
+		if (!strcmp(argv[arg_idx], "ls"))
+			return AskList(port_number);
 
-	if( ! strcmp(argv[arg_idx],"set") )
-		return ChangeCoordinate(argv[0], port_number, argc, argv);
+		if (!strcmp(argv[arg_idx], "set"))
+			return ChangeCoordinate(argv[arg_idx], port_number, argc - arg_idx - 1, &argv[arg_idx + 1]);
 
-	if( ! strcmp(argv[arg_idx],"loss") )
-		return ChangePacketLoss(argv[0], port_number, argc, argv);
+		if (!strcmp(argv[arg_idx], "loss"))
+			return ChangePacketLoss(argv[arg_idx], port_number, argc - arg_idx - 1, &argv[arg_idx + 1]);
 
-	if( ! strcmp(argv[arg_idx],"show") )
-		return AskShow(port_number);
+		if (!strcmp(argv[arg_idx], "show"))
+			return AskShow(port_number);
 
-	if( ! strcmp(argv[arg_idx],"status") )
-		return AskStatus(port_number);
+		if (!strcmp(argv[arg_idx], "status"))
+			return AskStatus(port_number);
 
-	if( ! strcmp(argv[arg_idx],"distance") )
-		return DistanceBetweenCID(argv[0], port_number, argc, argv);
+		if (!strcmp(argv[arg_idx], "distance"))
+			return DistanceBetweenCID(argv[arg_idx], port_number, argc - arg_idx - 1, &argv[arg_idx + 1]);
 
-	if( ! strcmp(argv[arg_idx],"close") )
-		return CloseAllClient(port_number);
+		if (!strcmp(argv[arg_idx], "close"))
+			return CloseAllClient(port_number);
 
-	cerr<<argv[0]<<" : Error : unknown order : "<<argv[1]<<endl;
+		cerr << argv[0] << " : Error : unknown order : " << argv[arg_idx] << endl;
+	}
+	Help(argv[0]);
 
 	return 1;
 }
