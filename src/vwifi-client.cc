@@ -99,10 +99,10 @@ int main (int argc , char ** argv){
 				perror("ioctl");
 				exit(1);
 			}
-			std::cerr<<"CID=" << cid << std::endl;
+			std::cout<<"CID=" << cid << std::endl;
 
 			close(fp);
-			
+
 			return 0;
 		}
 		else if( ! strcmp("-h", argv[arg_idx]) )
