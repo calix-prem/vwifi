@@ -4,6 +4,8 @@
 #include <unistd.h>
 #include <iostream>
 #include <string.h> // strcmp
+#include <sys/ioctl.h>
+#include <fcntl.h>
 
 #include <memory>
 
@@ -47,7 +49,7 @@ void  signal_handler(int signal_num)
 	std::cout << "OUT SWITCH" << std::endl ;
 }
 
-static const char usage[] = "Usage: vwifi-client [-h] [-v|--version] [-i IP_ADDR] [-p PORT]";
+static const char usage[] = "Usage: vwifi-client [-h] [-v|--version] [-i IP_ADDR] [-p PORT] [-c]";
 
 int main (int argc , char ** argv){
 
@@ -79,6 +81,29 @@ int main (int argc , char ** argv){
 		{
 			port_number = std::stoi(argv[arg_idx+1]);
 			arg_idx++;
+		}
+		else if( ! strcmp("-c", argv[arg_idx]) )
+		{
+			/* retrieve local VSock CID */
+
+			unsigned int cid = 0;
+			int fp = open("/dev/vsock", 0);
+			if (fp < 0)
+			{
+				perror("open");
+				exit(1);
+			}
+
+			if (ioctl(fp, IOCTL_VM_SOCKETS_GET_LOCAL_CID, &cid) < 0)
+			{
+				perror("ioctl");
+				exit(1);
+			}
+			std::cerr<<"CID=" << cid << std::endl;
+
+			close(fp);
+			
+			return 0;
 		}
 		else if( ! strcmp("-h", argv[arg_idx]) )
 		{
